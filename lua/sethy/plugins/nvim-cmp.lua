@@ -127,33 +127,6 @@ return {
             vim.api.nvim_feedkeys(keys, 'nt', true)
         end
 
-        -- custom smart tabs function
-        local smart_tab = function(opts)
-            local keys = nil
-            if vim.o.expandtab then
-                keys = '<Tab>' -- Neovim will insert spaces.
-            else
-                local col = column()
-                local line = vim.api.nvim_get_current_line()
-                local prefix = line:sub(1, col)
-                local in_leading_indent = prefix:find('^%s*$')
-                if in_leading_indent then
-                    -- inserts a hard tab.
-                    keys = '<Tab>'
-                else
-                    local sw = shift_width()
-                    local previous_char = prefix:sub(#prefix, #prefix)
-                    local previous_column = #prefix - #previous_char + 1
-                    local current_column = vim.fn.virtcol({ vim.fn.line('.'), previous_column }) + 1
-                    local remainder = (current_column - 1) % sw
-                    local move = remainder == 0 and sw or sw - remainder
-                    keys = (' '):rep(move)
-                end
-            end
-
-            vim.api.nvim_feedkeys(rhs(keys), 'nt', true)
-        end
-
         local select_next_item = function(fallback)
             if cmp.visible() then
                 cmp.select_next_item()
@@ -219,8 +192,6 @@ return {
 
         cmp.setup({
             experimental = {
-                -- HACK: experimenting with ghost text
-                -- `toggle_ghost_text()` function (no longer needed)
                 ghost_text = false,
             },
             completion = {
@@ -258,12 +229,8 @@ return {
                 },
             }),
 
-            -- NOTE: ! Experimenting with Customized Mappings ! --
+            -- NOTE: Customized Mappings con compatibilidad para Copilot
             mapping = cmp.mapping.preset.insert({
-                -- ['<BS>'] = cmp.mapping(function(_fallback)
-                --     smart_bs()
-                -- end, { 'i', 's' }),
-
                 ["<C-e>"] = cmp.mapping.abort(), -- close completion window
                 ['<C-d>'] = cmp.mapping(function()
                     cmp.close_docs()
@@ -287,7 +254,6 @@ return {
                     end
                 end, { 'i', 's' }),
 
-
                 ['<S-Tab>'] = cmp.mapping(function(fallback)
                     if cmp.visible() then
                         cmp.select_prev_item()
@@ -302,9 +268,9 @@ return {
                     end
                 end, { 'i', 's' }),
 
-                ['<Tab>'] = cmp.mapping(function(_fallback)
+                -- Corrección para Copilot: Pasa el control a Copilot vía fallback() cuando cmp no está visible
+                ['<Tab>'] = cmp.mapping(function(fallback)
                     if cmp.visible() then
-                        -- if there is only one completion candidate then use it.
                         local entries = cmp.get_entries()
                         if #entries == 1 then
                             confirm(entries[1])
@@ -313,10 +279,8 @@ return {
                         end
                     elseif has_luasnip and luasnip.expand_or_locally_jumpable() then
                         luasnip.expand_or_jump()
-                    elseif in_whitespace() then
-                        smart_tab()
                     else
-                        cmp.complete()
+                        fallback() -- Deja que Copilot o Neovim procese el <Tab>
                     end
                 end, { 'i', 's' }),
             }),
@@ -361,27 +325,5 @@ return {
                 end,
             },
         })
-
-        -- NOTE: Ghost text stuff
-        -- Only show ghost text at word boundaries, not inside keywords. Based on idea
-        -- from: https://github.com/hrsh7th/nvim-cmp/issues/2035#issuecomment-2347186210
-
-        -- vim.api.nvim_create_autocmd({ 'InsertEnter', 'CursorMovedI' }, {
-        --     callback = function()
-        --         if vim.api.nvim_get_mode().mode ~= 'i' then return end
-
-        --         local cursor_col = vim.fn.col('.')
-        --         local line = vim.fn.getline('.')
-        --         local char_after = line:sub(cursor_col, cursor_col)
-
-        --         local should_show = char_after == '' or vim.fn.match(char_after, [[\k]]) == -1
-
-        --         require('cmp.config').set_global({
-        --             experimental = { ghost_text = should_show }
-        --         })
-        --     end,
-        -- })
-        -- ! Ghost text stuff ! --
-
     end,
 }
