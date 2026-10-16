@@ -1,9 +1,9 @@
 return {
-	-- NOTE: Rose pine
+-- NOTE: Rose pine
 	{
 		"rose-pine/neovim",
 		name = "rose-pine",
-		-- priority = 1000,
+		priority = 1000,
 		config = function()
 			require("rose-pine").setup({
 				variant = "main", -- auto, main, moon, or dawn
@@ -19,19 +19,60 @@ return {
 					legacy_highlights = true,
 					migrations = true, -- Handle deprecated options automatically
 				},
+				palette = {
+					main = {
+						base = "#0e131f",    -- Fondo azul oscuro
+						surface = "#161c2e", -- Contraste para elementos secundarios/paneles
+						
+						-- Versiones más vívidas e intensas de los colores originales de Rosé Pine:
+						text = "#e6e4f8",  -- Texto blanco/lavanda más claro
+						love = "#ff6b8b",  -- Rojo/Rosa más brillante (Errores, Tags)
+						gold = "#ffcb77",  -- Amarillo dorado más brillante (Funciones, Números)
+						rose = "#ffb3b0",  -- Rosa cálido vívido (Strings, Constantes)
+						pine = "#31b0db",  -- Azul/Cian vívido (Nombres de tipos, notas)
+						foam = "#7ee8fa",  -- Turquesa claro (Variables, propiedades, H2)
+						iris = "#d2a8ff",  -- Violeta/Púrpura más brillante (Keywords, H1)
+						muted = "#8983a8", -- Comentarios/Líneas más legibles (original muy tenue)
+					},
+				},
 				highlight_groups = {
-					ColorColumn = { bg = "#1C1C21" },
-					-- Normal = { bg = "#000000" }, -- Main background remains transparent
-					NormalFloat = { bg = "#1C1C21" },
-					Pmenu = { bg = "#191724" }, -- Completion menu background
-					PmenuSel = { bg = "#4a465d", fg = "NONE" }, -- Highlighted completion item
-					FloatBorder = { bg = "base" },
-					FloatTitle = { bg = "base" },
-					-- PmenuSbar = { bg = "#191724" }, -- Scrollbar background
-					-- PmenuThumb = { bg = "#9ccfd8" }, -- Scrollbar thumb
+					-- Fondo y UI
+					Normal = { bg = "#0e131f" },
+					ColorColumn = { bg = "#161c2e" },
+					NormalFloat = { bg = "#161c2e" },
+					Pmenu = { bg = "#0e131f" },
+					PmenuSel = { bg = "#31b0db", fg = "#0e131f", bold = true },
+					FloatBorder = { bg = "#161c2e", fg = "pine" },
+					FloatTitle = { bg = "#161c2e", fg = "iris", bold = true },
+
+					-- Realce de Sintaxis y Etiquetas (mantiene los colores pero los hace resaltar)
+					Keyword = { fg = "iris", bold = true },         -- function, return, local, if, etc.
+					Statement = { fg = "iris", bold = true },
+					Function = { fg = "gold", bold = true },        -- Nombres de funciones
+					Type = { fg = "pine", bold = true },            -- Tipos / Clases
+					String = { fg = "rose" },                       -- Cadenas de texto
+					Number = { fg = "gold" },                       -- Números
+					Boolean = { fg = "rose", bold = true },         -- true / false
+					Constant = { fg = "rose", bold = true },
+					Identifier = { fg = "foam" },                   -- Variables / Propiedades
+					
+					-- HTML / JSX / Vue / TSX Tags
+					Tag = { fg = "love", bold = true },             -- Nombres de etiquetas HTML/JSX (<div/
+					Attribute = { fg = "foam" },                    -- Atributos de etiquetas
+					
+					-- Treesitter overrides
+					["@tag"] = { fg = "love", bold = true },
+					["@tag.attribute"] = { fg = "foam" },
+					["@tag.delimiter"] = { fg = "muted" },
+					["@keyword"] = { fg = "iris", bold = true },
+					["@function"] = { fg = "gold", bold = true },
+					["@function.call"] = { fg = "gold" },
+					["@property"] = { fg = "foam" },
+					["@variable"] = { fg = "text" },
+					["@type"] = { fg = "pine", bold = true },
 				},
 				groups = {
-					border = "muted",
+					border = "pine",
 					link = "iris",
 					panel = "surface",
 					error = "love",
@@ -61,10 +102,9 @@ return {
 
 			-- HACK: set this on the color you want to be persistent
 			-- when quit and reopening nvim
-			-- vim.cmd("colorscheme rose-pine")
+			vim.cmd("colorscheme rose-pine")
 		end,
-	},
-	-- NOTE: gruvbox
+	}, -- NOTE: gruvbox
 	{
 		"ellisonleao/gruvbox.nvim",
 		priority = 1000, -- Recomendado para el tema principal
@@ -115,7 +155,7 @@ return {
 				transparent_mode = false, -- Desactivar para que el negro de arriba sea el que mande
 			})
 
-			vim.cmd("colorscheme gruvbox")
+			-- vim.cmd("colorscheme gruvbox")
 		end,
 	},
 	{
@@ -123,17 +163,7 @@ return {
 		lazy = false,
 		priority = 1000,
 		config = function()
-			-- Forzar fondo negro antes de cargar el tema
-			vim.api.nvim_create_autocmd("ColorScheme", {
-				group = vim.api.nvim_create_augroup("custom_colors", { clear = true }),
-				callback = function()
-					vim.api.nvim_set_hl(0, "Normal", { bg = "#000000" })
-					vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#000000" })
-				end,
-			})
-
-			--vim.g.gruvbox_material_background = "hard"
-			--vim.cmd.colorscheme("gruvbox-material")
+			-- Se ha eliminado el autocmd de ColorScheme global que sobreescribía todos los demás temas
 		end,
 	},
 	-- NOTE: Kanagwa

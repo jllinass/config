@@ -9,6 +9,9 @@ vim.keymap.set("v", "J", ":m '>+1<CR>gv=gv")
 -- Move line up
 vim.keymap.set("v", "K", ":m '<-2<CR>gv=gv")
 
+-- Select All
+vim.keymap.set("n", "<leader>a", "ggVG")
+
 vim.keymap.set("n", "J", "mzJ`z")
 vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "move down in buffer with cursor centered" })
 vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "move up in buffer with cursor centered" })
